@@ -1,0 +1,67 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=Edge"><meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"><meta name="format-detection" content="telephone=no"><meta name="format-detection" content="email=no"><meta name="description" content="web前端开发, Hexo, webpack, Nodejs, Reactjs, Vuejs"><meta name="keywords" content="Hexo, Gruntjs, Nodejs, Reactjs, Vuejs"><title>JS对象（原型-继承-委托） - B_B</title><link rel="stylesheet" href="/css/main_style.min.css"><link rel="icon" href="/favicon.ico"></head><body><input id="navi" type="checkbox"><ul class="main-navication"><li><a href="/"><span>Home</span></a></li><li><a href="https://github.com"><span>Github</span></a></li><li><a href="https://www.v2ex.com/"><span>V2EX</span></a></li></ul><div class="wrapper" id="wrap"><div class="post-header"><label class="navi-button light" for="navi">MENU</label><img class="background" src="http://callfiles.ueibo.com/hexo-theme-laughing/post_background.jpg"><div class="post-title"><h1 class="title">JS对象（原型-继承-委托）</h1><ul class="meta"><li><i class="icon icon-author"></i>BensonChen</li><li><i class="icon icon-clock"></i>11 Minutes</li><li><i class="icon icon-calendar"></i>April 28, 2018</li></ul></div></div><div class="article-content" style="max-width:800px"><h2 id="记在前面"><a href="#记在前面" class="headerlink" title="记在前面"></a>记在前面</h2><p>在JS世界中，原型-继承-委托这三兄弟有点搞笑，与其一个个的拜访，倒不如一起开会，这样子我会更加理解一些。<br>当然，免不了要单独地简单阐述一下这三兄弟。在谈这三兄弟的时候，会时不时地引申出一些其他的概念。</p>
+<h2 id="对象"><a href="#对象" class="headerlink" title="对象"></a>对象</h2><p>什么是对象？</p>
+<pre><code>“JavaScript中万物皆为对象”，但这句话并不正确，准确地讲：应该是“任何非基本类型的都是对象类型”。
+</code></pre><p>可参考<a><a href="https://segmentfault.com/a/1190000012037062" target="_blank" rel="noopener">https://segmentfault.com/a/1190000012037062</a></a></p>
+<p>对象的创建有两种方法</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//1</span></span><br><span class="line"><span class="keyword">var</span> obj = &#123;</span><br><span class="line">    name: <span class="string">'Benson'</span>,</span><br><span class="line">    age: <span class="string">'66'</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//2</span></span><br><span class="line"><span class="keyword">var</span> obj2 = <span class="keyword">new</span> <span class="built_in">Object</span>();</span><br></pre></td></tr></table></figure>
+<p>对象，就先了解到这儿</p>
+<h2 id="原型"><a href="#原型" class="headerlink" title="原型"></a>原型</h2><p>想了很久，实在无法用一句准确描述原型，我只能说。他是一个概念。如果非要给原型加上一个定义的话，那么就是，‘原型是一个对象’。<br>刚刚提到，‘原型’是一个概念，是对JS中一部分特殊对象的一个描述。</p>
+<pre><code>原型是用来描述一个对象内部的[[prototype]]属性所对应对象的对象。
+</code></pre><p>有点绕，全是对象，我们慢慢缩句</p>
+<ol>
+<li>原型是对象</li>
+<li>原型是用来描述XXX的对象</li>
+<li>XXX是一个对象</li>
+<li>XXX是一个对象的[[prototype]]属性对应的对象</li>
+</ol>
+<h2 id="prototype"><a href="#prototype" class="headerlink" title="[[prototype]]"></a>[[prototype]]</h2><p>[[prototype]]这玩意儿不能直接访问（不能直接console.log()），但是Firefox和Chrome中提供了<strong>proto</strong>这个非标准（不是所有浏览器都支持）的对象（理解成访问器会更好一点儿）。这样子我们就可以愉快地观察[[prototype]]这个家伙了。</p>
+<p>每个对象创建的时候都会被赋予一个[[prototype]]，并且还是非空值。</p>
+<pre><code>那么这个家伙能干什么用呢？
+</code></pre><p>都知道，对象都有属性，几遍是JS中的‘对象’也不例外，有对象，自然就有属性。<br>当我们在执行 . 操作时（[[Get]]），第一步首先检查对象自有属性，如果没有找到，就会去[[prototype]]链中去查找。<br>那么，到底[[prototype]]的值是什么呢？</p>
+<pre><code>在创建对象时，[[prototype]]就会被赋予一个非空的值，这个值就是默认的Object.prototype。
+</code></pre><p>由于[[prototype]]存在链式调用的情况（继承），[[prototype]]的值可能会发生变化，这个时候就要仔细地判断了。</p>
+<h3 id="特别申明：机械的认为-prototype-指向的是他的父类，这个观点是及其错误的"><a href="#特别申明：机械的认为-prototype-指向的是他的父类，这个观点是及其错误的" class="headerlink" title="特别申明：机械的认为 [[prototype]] 指向的是他的父类，这个观点是及其错误的"></a><font color="red">特别申明：机械的认为 [[prototype]] 指向的是他的父类，这个观点是及其错误的</font></h3><p>这个我们放在后面继承里面慢慢道来<br>原型写到这里我就打算停下来了，毕竟我只是为了搞清楚三兄弟的关系，没必要扒他的祖宗十八代。</p>
+<h2 id="继承"><a href="#继承" class="headerlink" title="继承"></a>继承</h2><p>在这个部分就会涉及到对[[prototype]]的各种尝试。<br>首先来看一个原型继承的栗子</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">User</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.name = name;</span><br><span class="line">    <span class="keyword">this</span>.age = age;</span><br><span class="line">&#125;</span><br><span class="line">p.prototype = &#123;</span><br><span class="line">    print: <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123; <span class="built_in">console</span>.log(<span class="keyword">this</span>.name, <span class="keyword">this</span>.age); &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> Benson = <span class="keyword">new</span> User(<span class="string">'Benson'</span>, <span class="number">20</span>);</span><br><span class="line">Benson.print(); <span class="comment">// Benson 20</span></span><br></pre></td></tr></table></figure>
+<p>由上面的栗子我们可以看到，继承就意味着儿子拥有了老子的一些东西，正所谓：“老子的是我的，我的还是我的”。</p>
+<pre><code>当查找一个对象的属性时，JavaScript 会向上遍历原型链，直到找到给定名称的属性为止。
+</code></pre><p>那么这是不是就意味着，儿子的[[prototype]]指向老子，就是继承了呢？可以暂且这样理解。<br>关于继承的方式可以参考<a><a href="https://www.cnblogs.com/humin/p/4556820.html" target="_blank" rel="noopener">https://www.cnblogs.com/humin/p/4556820.html</a></a><br>这里我不想讲继承的种种，我只想搞清楚，在继承的过程中儿子的原型链（[[prototype]]）发生了什么事情。<br>继承的方式有好几种，我们最常用的就是通过 new 关键字。但就是这个 new 关键字，会给我带来一系列的尴尬和困扰。</p>
+<p>看一个栗子<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">User</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.name = name;</span><br><span class="line">    <span class="keyword">this</span>.age = age;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> Benson = <span class="keyword">new</span> User(<span class="string">'Benson'</span>, <span class="number">20</span>);</span><br><span class="line"><span class="built_in">console</span>.log(Benson.__proto__.constructor); <span class="comment">// User()</span></span><br></pre></td></tr></table></figure></p>
+<p>这里很正常，Benson.<strong>proto</strong>.constructor是指向User的。</p>
+<pre><code>解释一下__proto__.constructor，我们知道__proto__（[[prototype]]）会在function声明的时候就创建，
+它里面会包含一个constructor属性，这个属性引用的是对象关联的函数。
+</code></pre><p>看到这里，是不是就可以认为：由于使用了new，所以Benson.<strong>proto</strong>.constructor获得了User()，而且看起来，User()是一个构造函数。</p>
+<pre><code>可以很负责地告诉你，这个看法是错误的。
+</code></pre><p>让我来详细解释一下原因。<br>首先，JS中并不存在所谓的 ‘构造函数’。<br>在通常情况下 User() 都只是一个普通的不能再普通的函数， 但是由于 new 的存在，造成了User()的调用方式变成了 “构造函数调用”。<br>new 会劫持普通函数的调用，并且用构造函数的方式来调用这个函数。<br>所以将 ‘构造函数’ 称之为 ‘构造函数的调用’ 更为恰当。<br>不相信的话可以在User()中添加一句console.log（123）。结果就一目了然了。</p>
+<p>还是觉得不可思议？<br>好，接着举栗子<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Foo</span>(<span class="params"></span>) </span>&#123; ... &#125;</span><br><span class="line">Foo.prototype = &#123; ... &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> a1 = <span class="keyword">new</span> Foo();</span><br><span class="line">a1.constructor === Foo <span class="comment">//false</span></span><br><span class="line">a1.constructor === object <span class="comment">//true</span></span><br></pre></td></tr></table></figure></p>
+<p>依据 “constructor是由XXX构造”的错误理论来讲，new Foo() 相当于构造了一个对象并赋值给 a1 。<br>那么这个时候 a1.constructor应该指向Foo()才对，但事情并没有这样子发展。</p>
+<h4 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h4><p>在上上面的栗子中，Benson.constructor === user() 是千真万确的，问题就在这里，Benson.constructor是对User()的引用吗？</p>
+<pre><code>肯定不是
+</code></pre><p>事实上在 Benson 继承 User 的时候，Benson.constructor 已经被 Benson.[[prototype]] 委托给了 User.prototype 而 User.prototype.constructor 默认指向的是 User</p>
+<pre><code>由此引出，继承的准确定义：子类的[[prototype]] === 父类的 prototype。(解决上面关于继承定义买下的包袱)
+</code></pre><p>在上面的栗子中，由于重新的定义了 Foo.prototype ，里面没有包含 constructor ，所以 Benson.[[prototype]].constructor 就没有东西， 怎么办呢？ 通过原型链继续往上找，于是乎找到了Foo.[[prototype]]中的 constructor ，这个 constructor此时是指向 object 的</p>
+<font color="red">[[prototype]]机制就是指定对象中的一个内部链接引用另一个对象。<br>如果第一个对象上没有找到需要的属性/方法，就会在[[prototype]]关联的对象上进行查找，如果也没有找到会继续找他的[[prototype]]，以此类推。<br>这一系列对象的链接，就叫原型链。<br></font>
+
+<pre><code>原型链的本质就是 对象之间的关联关系。 而这种关系的维护并非上面提及的 ‘继承’和‘类’，是通过 委托行为 来进行的。
+</code></pre><p>委托行为，意味着某些对象在找不到属性/方法的时候，会把这个请求委托给另一个对象。</p>
+<h3 id="干货"><a href="#干货" class="headerlink" title="干货"></a>干货</h3><pre><code>[[prototype]] == __proto__   默认指向构造函数调用的 prototype。
+</code></pre><p>(注意：所有函数对象的[[prototype]]都指向Function.prototype，它是一个空函数;所有对象的 [[prototype]] 都指向其构造器的 prototype)</p>
+<pre><code>prototype  指向构造函数的原型对象（constructor指向对象）
+</code></pre><p>原型对象（Person.prototype）是 构造函数（Person）的一个实例(除开Function.prototype 它是函数对象，不是原型对象)。<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> Y = <span class="keyword">new</span> Person();</span><br><span class="line">Person.prototype = Y;</span><br><span class="line"><span class="comment">//这个Y其实就是一个普通对象而已。</span></span><br></pre></td></tr></table></figure></p>
+<p>我们创建一个函数A(就是声明一个函数), 那么浏览器就会在内存中创建一个对象B，而且每个函数都默认会有一个属性 prototype 指向了这个对象( 即：prototype的属性的值是这个对象 )。<br>这个对象B就是函数A的原型对象，简称函数的原型。<br>这个原型对象B 默认会有一个属性 constructor 指向了这个函数A ( 意思就是说：constructor属性的值是函数A )。</p>
+<p><img src="http://o7cqr8cfk.bkt.clouddn.com/public/16-11-10/43031030.jpg" alt="原型对象"><br>当把一个函数作为构造函数（使用new）来创建对象的时候，那么这个被创建的对象就会存在一个默认的不可见的属性，来指向了构造函数（函数A）的原型对象（上面提到的对象B）， 这个不可见的属性我们一般用 [[prototype]] 来表示。<br><img src="http://o7cqr8cfk.bkt.clouddn.com/public/16-11-10/6663492.jpg" alt="原型对象"></p>
+<p>B的[[prototype]]则指向 Object.prototype 又 Object.prototype.[[prototype]] === null。<br>Object.[[prototype]] 指向 Function.prototype</p>
+<p>一个声明函数的原型对象(prototype）指向的是 Object, 它的[[prototype]]指向的是Function.prototype;</p>
+<h2 id="先写这么多吧"><a href="#先写这么多吧" class="headerlink" title="先写这么多吧"></a>先写这么多吧</h2></div><div class="article-meta" style="max-width:800px"><div class="tags"><i class="icon icon-tag"></i><ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JS-原型-继承-委托/">JS 原型 继承 委托</a><span class="tag-list-count">1</span></li></ul></div></div><div class="article-comment" style="max-width:800px"><div class="ds-thread" id="ds-thread" data-thread-key="cjp1cczs6000254w0wdhb6pib" data-title="JS对象（原型-继承-委托）" data-url="http://yoursite.com/2018/04/28/JS-原型-继承-委托/" site-name="ueibo"></div><script>var siteName = document.getElementById('ds-thread').getAttribute('site-name');
+var duoshuoQuery = {short_name: siteName};
+(function() {
+  var ds = document.createElement('script');
+  ds.type = 'text/javascript';ds.async = true;
+  // ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+  ds.charset = 'UTF-8';
+  (document.getElementsByTagName('head')[0] 
+  || document.getElementsByTagName('body')[0]).appendChild(ds);
+})();</script></div><ul class="navication"><li class="home"><a href="/"><i class="icon icon-home"></i></a></li><li><a href="/2018/05/02/JS中的This/"><i class="icon icon-arror-left"></i></a></li><li><a href="/2018/04/26/js计算题/"><i class="icon icon-arror-right"></i></a></li></ul><div class="page-footer"><div class="top"><ul class="social"><li><a href="https://github.com/472756921" title="Github" target="_blank"><i class="icon icon-github"></i></a></li></ul></div><div class="bottom"><p class="copyright">© 2018 B_B<br><small>POWER BY <a href="https://hexo.io" target="_blank">HEXO</a></small><small>, THEME BY <a href="https://github.com/BoizZ/hexo-theme-laughing" target="_blank">LAUGHING</a></small></p></div></div></div><script>var wrap = document.getElementById('wrap');
+window.onload = function () {
+  wrap.className += ' done';
+}</script></body></html>

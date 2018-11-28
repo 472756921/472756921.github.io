@@ -1,0 +1,55 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=Edge"><meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"><meta name="format-detection" content="telephone=no"><meta name="format-detection" content="email=no"><meta name="description" content="web前端开发, Hexo, webpack, Nodejs, Reactjs, Vuejs"><meta name="keywords" content="Hexo, Gruntjs, Nodejs, Reactjs, Vuejs"><title>'webpack读书笔记' - B_B</title><link rel="stylesheet" href="/css/main_style.min.css"><link rel="icon" href="/favicon.ico"></head><body><input id="navi" type="checkbox"><ul class="main-navication"><li><a href="/"><span>Home</span></a></li><li><a href="https://github.com"><span>Github</span></a></li><li><a href="https://www.v2ex.com/"><span>V2EX</span></a></li></ul><div class="wrapper" id="wrap"><div class="post-header"><label class="navi-button light" for="navi">MENU</label><img class="background" src="http://callfiles.ueibo.com/hexo-theme-laughing/post_background.jpg"><div class="post-title"><h1 class="title">'webpack读书笔记'</h1><ul class="meta"><li><i class="icon icon-author"></i>BensonChen</li><li><i class="icon icon-clock"></i>8 Minutes</li><li><i class="icon icon-calendar"></i>November 12, 2018</li></ul></div></div><div class="article-content" style="max-width:800px"><h2 id="为什么会有webpack"><a href="#为什么会有webpack" class="headerlink" title="为什么会有webpack"></a>为什么会有webpack</h2><p>现代web开发中模块式是一个必备解决方案，因此诞生以一些列模块式工具，诸如AMD，CMD，commonJS，ES6模块等概念和工具。</p>
+<blockquote>
+<p>前端模块要在客户端中执行，所以他们需要增量加载到浏览器中。<br>模块的加载和传输，我们首先能想到两种极端的方式，一种是每个模块文件都单独请求，另一种是把所有模块打包成一个文件然后只请求一次。显而易见，每个模块都发起单独的请求造成了请求次数过多，导致应用启动速度慢；一次请求加载所有模块导致流量浪费、初始化过程慢。这两种方式都不是好的解决方案，它们过于简单粗暴。<br>引自-《Webpack 中文指南》</p>
+</blockquote>
+<blockquote>
+<p>分块传输，按需进行懒加载，在实际用到某些模块的时候再增量更新，才是较为合理的模块加载方案。要实现模块的按需加载，就需要一个对整个代码库中的模块进行静态分析、编译打包的过程。<br>引自-《Webpack 中文指南》</p>
+</blockquote>
+<blockquote>
+<p>在编译的时候，要对整个代码进行静态分析，分析出各个模块的类型和它们依赖关系，然后将不同类型的模块提交给适配的加载器来处理。比如一个用 LESS 写的样式模块，可以先用LESS加载器将它转成一个CSS 模块，在通过 CSS 模块把他插入到页面的’style’标签中执行。Webpack 就是在这样的需求中应运而生。<br>引自-《Webpack 中文指南》</p>
+</blockquote>
+<h1 id="webpack-的身世"><a href="#webpack-的身世" class="headerlink" title="webpack 的身世"></a>webpack 的身世</h1><h2 id="webpack本地（局部）安装如何运行"><a href="#webpack本地（局部）安装如何运行" class="headerlink" title="webpack本地（局部）安装如何运行"></a>webpack本地（局部）安装如何运行</h2><p>在本地安装webpack后，由于没有环境变量，所以无法直接使用webpack，这个时候我们可以借助npm实现webpack的使用<br>如在package.json中配置：<br>“dev”: “webpack –mode development”.<br>“build”: “webpack –mode production”.( –mode production表示生产环境)</p>
+<h2 id="什么是-Webpack"><a href="#什么是-Webpack" class="headerlink" title="什么是 Webpack"></a>什么是 Webpack</h2><p>Webpack 是一个模块打包器。它将根据模块的依赖关系进行静态分析，然后将这些模块按照指定的规则生成对应的静态资源。<br>包括：</p>
+<ol>
+<li>代码转换</li>
+<li>文件优化（压缩文件，合并图片）</li>
+<li>代码分割（提取公共代码，让首屏不需要的代码和资源异步加载）</li>
+<li>模块合并</li>
+<li>代码验证</li>
+<li>自动发布（代码更新后，自动构建发布）</li>
+</ol>
+<h2 id="Loader"><a href="#Loader" class="headerlink" title="Loader"></a>Loader</h2><p>Webpack 本身只能处理 JavaScript 模块，如果要处理其他类型的文件，就需要使用 loader进行转换。<br>Loader 可以理解为是模块和资源的转换器，它本身是一个函数，接受源文件作为参数，返回转换的结果。这样，我们就可以通过 require 来加载任何类型的模块或文件，比如CoffeeScript、JSX、 LESS 或图片。<br>Loader的写法：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>: &#123;</span><br><span class="line">    rules: [</span><br><span class="line">        &#123;<span class="attr">test</span>: <span class="regexp">/\.css$/</span>, <span class="attr">use</span>:[<span class="string">'style-loader'</span>, <span class="string">'css-loader?minimize'</span>] &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>注意loader的执行顺序是从后向前，先由css-loader读取css文件，再由style-loader将其注入到JS文件中。<br>每个loader都可以传入参数（URL querysting 的方式），minimize 表示开启css压缩，能够减少css部分 10%-20% 的体积。</p>
+<h2 id="Plugin"><a href="#Plugin" class="headerlink" title="Plugin"></a>Plugin</h2><p>Plugin是用来扩展webpack功能的。在 Webpack 构建流程中的特定时机注入扩展逻辑，来改变构建结果或做我们想要的事情。<br>这是一个Plugin的例子，用于单独打包css<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>: &#123;</span><br><span class="line">    rules: [</span><br><span class="line">        &#123;</span><br><span class="line">            test: <span class="regexp">/\.css$/</span>, <span class="comment">//这个时候就不需要style-loader把CSS注入到js中了</span></span><br><span class="line">            loader:[MiniCssExtractPlugin.loader,<span class="string">'css-loader'</span>]</span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;,</span><br><span class="line">plugins: [</span><br><span class="line">    <span class="keyword">new</span> MiniCssExtractPlugin(&#123;</span><br><span class="line">        filename: <span class="string">`[name]_[contenthash:8].css`</span>,</span><br><span class="line">    &#125;)</span><br><span class="line">]</span><br></pre></td></tr></table></figure></p>
+<h2 id="source-map"><a href="#source-map" class="headerlink" title="source-map"></a>source-map</h2><p>有了这个东西就可以映射源码。<br>在config中配置：devtool: ‘source-map’（与entry同级） 即可</p>
+<h2 id="webpack中的各种概念"><a href="#webpack中的各种概念" class="headerlink" title="webpack中的各种概念"></a>webpack中的各种概念</h2><p>module：模块，一个模块对应一个文件，Webpack会从entry开始，递归找出所有依赖的模块。<br>loader：模块转换器，将一个模块按照要求转化成新的内容。<br>plugins：插件，在构建流中特定的时机（取决于插件开发者，我们一般是被动的使用）注入扩展逻辑，来改变结构达到我们想要的效果。</p>
+<h1 id="webpack-详细"><a href="#webpack-详细" class="headerlink" title="webpack 详细"></a>webpack 详细</h1><p>前面讲讲了一大堆，想必对webpack有了一个大致的了解，下面的部分将详细记录webpack的各种工作和功能。</p>
+<h2 id="Content"><a href="#Content" class="headerlink" title="Content"></a>Content</h2><p>Content是寻找文件的根目录，默认启动webpack时所在的目录，可设置指定<br>content:path.resolve(__dirname, ‘XXX’),   （xxx绝对路径）</p>
+<h2 id="Entry"><a href="#Entry" class="headerlink" title="Entry"></a>Entry</h2><p>Entry是配置的模块的入口，搜寻及递归解析出所有入口依赖的模块（必填）。<br>Entry有三种配置方式</p>
+<ol>
+<li>string</li>
+<li>array（搭配 output.library 配置项使用时，只有数组里的最后一个入口文件的模块会被导出）</li>
+<li>object（配置多个入口，每个入口生成一个Chunk（代码块））</li>
+</ol>
+<p>entry 也可以配置成动态的方式<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">entry : <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">        a : ’. / p ages/a ’,</span><br><span class="line">        b :’./pages/ b ’,</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="Chunk"><a href="#Chunk" class="headerlink" title="Chunk"></a>Chunk</h3><p>可以理解为‘代码块’<br>如果entry是一个String/array，只会生成一个chunk，名字是mian<br>如果entry是一个Obj，就可能出现多个Chunk，名字是obj中的键值(key)</p>
+<h2 id="Output"><a href="#Output" class="headerlink" title="Output"></a>Output</h2><p>filename: 输出文件名<br>如果只有一个chunk的话，filename 可使用静态string，如果是多个chunk的话则可用变量模板，例如 ‘[name].js’<br>这里的[name]是chunk内置的name变量去替换（除了name还有id，hash-&gt;hash:8，chunkhash-&gt;chunkhash:8(指定长度)）</p>
+<h3 id="path"><a href="#path" class="headerlink" title="path"></a>path</h3><p>输出的文件存放目录，必须是 string 类型的绝对路径。通常通过Node.js的 path 模块去获取绝对路径。<br>path: path.resolve(__dirname, ‘./dist’)</p>
+<h3 id="publicPath"><a href="#publicPath" class="headerlink" title="publicPath"></a>publicPath</h3><p>在复杂的项目里可能会有一些构建出的资源需要异步加载，加载这些异步资源需要对应的URL地址。<br>publicPath: 配置发布到线上资源的 URL 前缀，为 string 类型。默认值是空字符串 ，即使用相对路径。</p>
+<h3 id="library-和-libraryTarget"><a href="#library-和-libraryTarget" class="headerlink" title="library 和 libraryTarget"></a>library 和 libraryTarget</h3><p>这两兄弟是构建可以被其他模块导入的库时要用到的东西。<br>略过</p>
+<h3 id="libraryExport"><a href="#libraryExport" class="headerlink" title="libraryExport"></a>libraryExport</h3><p>配置导出模块中哪些子模块需要被导出<br>同上略过</p>
+<p>开发组件库时需要用到上面两个东西</p>
+<h2 id="module"><a href="#module" class="headerlink" title="module"></a>module</h2><p>配置模块处理规则</p>
+</div><div class="article-meta" style="max-width:800px"></div><div class="article-comment" style="max-width:800px"><div class="ds-thread" id="ds-thread" data-thread-key="cjp1cczsg000754w0ilvj3muo" data-title="'webpack读书笔记'" data-url="http://yoursite.com/2018/11/12/webpack读书笔记/" site-name="ueibo"></div><script>var siteName = document.getElementById('ds-thread').getAttribute('site-name');
+var duoshuoQuery = {short_name: siteName};
+(function() {
+  var ds = document.createElement('script');
+  ds.type = 'text/javascript';ds.async = true;
+  // ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+  ds.charset = 'UTF-8';
+  (document.getElementsByTagName('head')[0] 
+  || document.getElementsByTagName('body')[0]).appendChild(ds);
+})();</script></div><ul class="navication"><li class="home"><a href="/"><i class="icon icon-home"></i></a></li><li><a href="/2018/11/28/hello-world/"><i class="icon icon-arror-left"></i></a></li><li><a href="/2018/10/26/redux解析/"><i class="icon icon-arror-right"></i></a></li></ul><div class="page-footer"><div class="top"><ul class="social"><li><a href="https://github.com/472756921" title="Github" target="_blank"><i class="icon icon-github"></i></a></li></ul></div><div class="bottom"><p class="copyright">© 2018 B_B<br><small>POWER BY <a href="https://hexo.io" target="_blank">HEXO</a></small><small>, THEME BY <a href="https://github.com/BoizZ/hexo-theme-laughing" target="_blank">LAUGHING</a></small></p></div></div></div><script>var wrap = document.getElementById('wrap');
+window.onload = function () {
+  wrap.className += ' done';
+}</script></body></html>
