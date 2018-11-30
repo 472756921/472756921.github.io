@@ -34,7 +34,7 @@
 <p>createStore方法中的enhancer就是用applyMiddleware函数来创建的。<br>它是 Redux 的原生方法，作用是将所有中间件组成一个数组，依次执行。并且将getState和dispatch两个方法通过middlewareAPI传递进入中间件内部。<br>特别注意中间件的加载顺序，在某些情况下，中间件需要按照特定的顺序加载。<br>而编写中间件需要注意异步中间件的情况，其实也很简单，就是判断action类型，如果是方法的话直接执行他，如果不是的话，就把action传递出去。<br>所以说，applyMiddleware实际上做了一件事，就是根据外部函数(中间件函数)包装原来的dispatch函数，然后将新的dispatch函数暴露出去。</p>
 <h3 id="bindActionCreators-js"><a href="#bindActionCreators-js" class="headerlink" title="bindActionCreators.js"></a>bindActionCreators.js</h3><p>这个方法主要的作用就是将action与dispatch函数绑定，生成直接可以触发action的函数。</p>
 <h3 id="combineReducers-js"><a href="#combineReducers-js" class="headerlink" title="combineReducers.js"></a>combineReducers.js</h3><p>combineReducers 辅助函数的作用是，把一个由多个不同 reducer 函数作为 value 的 object，合并成一个最终的 reducer 函数，然后就可以对这个 reducer 调用createStore。<br>合并后的 reducer 可以调用各个子 reducer，并把它们的结果合并成一个 state 对象。state 对象的结构由传入的多个 reducer 的 key 决定。</p>
-</div><div class="article-meta" style="max-width:1024px"></div><div class="article-comment" style="max-width:1024px"><div class="ds-thread" id="ds-thread" data-thread-key="cjp4330a90009zsw0sw9mzeri" data-title="'redux解析'" data-url="http://yoursite.com/2018/10/26/redux解析/" site-name="ueibo"></div><script>var siteName = document.getElementById('ds-thread').getAttribute('site-name');
+</div><div class="article-meta" style="max-width:1024px"></div><div class="article-comment" style="max-width:1024px"><div class="ds-thread" id="ds-thread" data-thread-key="cjp44azrz00092ww0hnawslri" data-title="'redux解析'" data-url="http://yoursite.com/2018/10/26/redux解析/" site-name="ueibo"></div><script>var siteName = document.getElementById('ds-thread').getAttribute('site-name');
 var duoshuoQuery = {short_name: siteName};
 (function() {
   var ds = document.createElement('script');
